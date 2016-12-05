@@ -4,12 +4,7 @@ import Data.Hash.MD5
 import Data.Maybe
 
 main = do
-    print getPassword1
-    -- For the love of God, compile this with all optimizations ON.
-    -- getPassword2 looks through the list of possible hashes from the start
-    -- for every position in the password. This is very readable and simple,
-    -- but also naive. Make sure you let GHC memoize properly by tunring the
-    -- optimizations on.
+    -- print getPassword1
     print getPassword2
 
 prefix = replicate 5 '0'
@@ -20,8 +15,16 @@ allInputs = map (Str . (\i -> myInput ++ show i)) [0..]
 getPassword1 = take 8 $ map (!!5) $ filter (\s -> take 5 s == prefix) $ map md5s allInputs
 
 -- For positions 0 through 7, find the first occurence
-getPassword2 = map (\pos -> fromJust $ lookup pos allPositions) [0..7]
+getPassword2 = getPassword2' allPositions (replicate 8 Nothing)
 
+getPassword2' :: [(Int, Char)] -> [Maybe Char] -> String
+getPassword2' _ acc | not (Nothing `elem` acc) = map fromJust acc
+getPassword2' ((p,c):xs) pass
+  | isNothing (pass !! p) = getPassword2' xs (insertAt p (Just c) pass)
+  | otherwise = getPassword2' xs pass
+      where
+          insertAt i e l = take i l ++ [e] ++ drop (i+1) l
+  
 -- Infinite list of the interesting characters and their positions.
 allPositions =
     map (\(p:c:s) -> (digitToInt p, c)) $
