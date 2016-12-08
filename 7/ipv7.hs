@@ -1,4 +1,5 @@
 import Data.Char
+import Data.List.Split
 
 -- main = do
 --     input <- "input.txt"
@@ -11,17 +12,12 @@ type Id = String
 
 supportsTLS = undefined
 
-parse :: String -> ([Id], [HypSeq])
-parse s = undefined
+-- parse :: String -> ([Id], [HypSeq])
+parse = (\l -> (evens l, odds l)) . splitOneOf ['[',']']
 
-parseId [] = []
-parseId s = firstId:parseId rest
-    where
-        (firstId, rest) = (takeWhile isAlpha s, dropWhile (==']') $ dropWhile isAlpha $ dropWhile (=='[') $ dropWhile isAlpha s)
+evens (i:i':is) = i:evens is
+evens (i:is) = [i]
+evens _ = []
 
-parseHS [] = []
-parseHS s 
-  | all isAlpha s = []
-  | otherwise = firstHS:parseHS rest
-    where
-        (firstHS, rest) = (takeWhile isAlpha $ dropWhile (=='[') $ dropWhile isAlpha s, dropWhile (==']') $ dropWhile isAlpha $ dropWhile (=='[') $ dropWhile isAlpha s)
+odds [] = []
+odds l = evens $ tail l
