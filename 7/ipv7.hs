@@ -4,7 +4,10 @@ import Data.List.Split
 
 main = do
     input <- readFile "input.txt"
+    print "Part 1"
     print $ solve1 input
+    print "Part 2"
+    print $ solve2 input
 
 solve1 :: String -> Int
 solve1 = length . filter supportsTLS . lines
@@ -16,7 +19,6 @@ supportsTLS = supportsTLS' . parse
 
 supportsTLS' (ids, hs) = any hasPalin4s ids && (not $ any hasPalin4s hs)
 
--- parse :: String -> ([Id], [HypSeq])
 parse = (\l -> (evens l, odds l)) . splitOneOf ['[',']']
 
 evens (i:i':is) = i:evens is
@@ -33,3 +35,15 @@ hasPalin4s = any isPalin4 . fours
     where
         isPalin4 (a:b:c:d:[]) = a == d && b == c && a /= b
         fours = groups 4
+
+-- Part 2
+
+solve2 = length . filter supportsSSL . lines
+
+supportsSSL = not . null . regroup . parse
+
+-- Take the ids and hypers and group them into a lists of all substrings of
+-- length 3 in them.
+regroup (ids, hs) = [ (x,y) | x <- (concat $ map (groups 3) ids), y <- (concat $ map (groups 3) hs)]
+
+match (a:b:c:[]) (a':b':c':[]) = a /= b && a == c && a' == c' && a == b' && b == a'
