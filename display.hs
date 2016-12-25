@@ -1,4 +1,12 @@
 import Data.Char
+import Data.List
+
+updateDisplay (instruction, (x,y)) = instruction x y display
+
+type Display = [[Maybe ()]]
+
+display :: [[Maybe ()]]
+display = replicate 50 (replicate 6 Nothing)
 
 parse = parse' . words
 
@@ -14,6 +22,12 @@ parseRect s = (read first, read second)
 
 parseRC (('y':'=':row):_:rot:[]) = (read row, read rot)
 
-rect = 0
-row = 1
-col = 2
+rect x y d = -- List comprehension
+row rowNum sh d = transpose $ (\c ->  d' !!= (sh, c))  $ shift sh $ d' !! rowNum 
+    where
+        d' = transpose d
+col colNum sh d = (\c ->  d !!= (sh, c))  $ shift sh $ d !! colNum 
+
+shift steps list = take (length list) $ drop steps $ cycle list
+
+list !!= (pos, elem) = take pos list ++ elem:drop (pos + 1) list
